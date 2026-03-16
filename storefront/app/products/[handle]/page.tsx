@@ -5,9 +5,19 @@ import AddToCart from '@/components/add-to-cart'
 
 async function getProduct(handle: string) {
   try {
-    // CORRECT: Use list() with handle filter (no dedicated retrieveByHandle)
+    // First get region for price calculation
+    const regionsResponse = await medusaClient.store.region.list()
+    const regionId = regionsResponse.regions[0]?.id
+
+    if (!regionId) {
+      throw new Error('No region found')
+    }
+
+    // Then fetch product with region for prices
     const response = await medusaClient.store.product.list({
       handle,
+      region_id: regionId,
+      fields: '+variants.calculated_price',
     })
 
     return response.products?.[0] || null

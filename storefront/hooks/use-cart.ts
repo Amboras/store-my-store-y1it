@@ -38,10 +38,31 @@ export function useCart() {
         }
       }
 
-      const response = await medusaClient.store.cart.create({})
-      const newCart = response.cart
-      setCartId(newCart.id)
-      return newCart
+      // Get region to create cart with
+      const regionsResponse = await medusaClient.store.region.list()
+      const regionId = regionsResponse.regions[0]?.id
+
+      if (!regionId) {
+        throw new Error('No region found')
+      }
+
+      try {
+        // Try creating cart with region_id
+        const response = await medusaClient.store.cart.create({
+          region_id: regionId,
+        })
+        const newCart = response.cart
+        setCartId(newCart.id)
+        return newCart
+      } catch (error: any) {
+        // If error mentions sales channel, provide helpful message
+        if (error?.message?.includes('sales channel')) {
+          console.error('Cart creation failed: Multiple sales channels associated with API key')
+          console.error('Please configure NEXT_PUBLIC_SALES_CHANNEL_ID in .env.local')
+          throw new Error('Cart creation requires sales channel configuration. See console for details.')
+        }
+        throw error
+      }
     },
     staleTime: 0,
   })

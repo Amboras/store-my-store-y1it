@@ -12,13 +12,25 @@ cd my-store
 # 2. Install dependencies
 make install
 
-# 3. Start development
+# 3. Start development (auto-setup runs on first start)
 make dev
 ```
 
 **That's it!** Your store is running at:
-- Backend: http://localhost:9000
-- Storefront: http://localhost:3000
+- **Backend API**: http://localhost:9000
+- **Admin Dashboard**: http://localhost:9000/app
+- **Storefront**: http://localhost:3000
+
+### First Run Auto-Setup ✨
+
+On first `make dev`, the system automatically:
+- ✅ Creates region (India/INR)
+- ✅ Creates sales channel
+- ✅ Generates publishable API key
+- ✅ Links everything together
+- ✅ Configures storefront
+
+**Now just add products via admin and everything works!**
 
 ## Customize Your Store
 
@@ -60,6 +72,7 @@ make install       # Install dependencies
 make dev           # Start both backend + storefront
 make dev-backend   # Backend only
 make dev-storefront # Storefront only
+make seed          # Seed demo data (categories, products, promotions)
 make stop          # Stop all services
 ```
 

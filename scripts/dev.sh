@@ -74,8 +74,17 @@ trap cleanup SIGINT SIGTERM
 ) >> dev.log 2>&1 &
 BACKEND_PID=$!
 
-# Wait a bit for backend to start
-sleep 3
+# Wait for backend to be ready
+echo -e "${BLUE}⏳ Waiting for backend...${NC}"
+sleep 5
+
+# Run auto-bootstrap (only on first run)
+if [ ! -f ".bootstrap-complete" ]; then
+    echo -e "${YELLOW}🔧 First run detected - running auto-setup...${NC}"
+    ./scripts/bootstrap.sh >> dev.log 2>&1 || true
+else
+    echo -e "${GREEN}✅ Bootstrap already completed${NC}"
+fi
 
 # Start storefront
 (

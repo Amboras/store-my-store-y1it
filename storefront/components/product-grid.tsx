@@ -7,6 +7,7 @@ interface ProductGridProps {
   limit?: number
   collectionId?: string
   categoryId?: string
+  sortBy?: string
 }
 
 // Loading skeleton component
@@ -27,12 +28,32 @@ export default function ProductGrid({
   limit = 8,
   collectionId,
   categoryId,
+  sortBy = 'newest',
 }: ProductGridProps) {
-  const { data: products, isLoading, error } = useProducts({
+  const { data: rawProducts, isLoading, error } = useProducts({
     limit,
     collection_id: collectionId,
     category_id: categoryId,
   })
+
+  // Sort products based on sortBy prop
+  const products = rawProducts ? [...rawProducts].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        const priceA = a.variants?.[0]?.calculated_price?.calculated_amount || 0
+        const priceB = b.variants?.[0]?.calculated_price?.calculated_amount || 0
+        return priceA - priceB
+      case 'price-high':
+        const priceAHigh = a.variants?.[0]?.calculated_price?.calculated_amount || 0
+        const priceBHigh = b.variants?.[0]?.calculated_price?.calculated_amount || 0
+        return priceBHigh - priceAHigh
+      case 'name':
+        return (a.title || '').localeCompare(b.title || '')
+      case 'newest':
+      default:
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    }
+  }) : rawProducts
 
   // Loading state
   if (isLoading) {

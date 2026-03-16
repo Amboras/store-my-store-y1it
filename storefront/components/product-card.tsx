@@ -6,16 +6,18 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  // Get the first variant's price
+  // Get the first variant's calculated price (Medusa v2)
   const variant = product.variants?.[0]
-  const price = variant?.prices?.[0]
+  const calculatedPrice = variant?.calculated_price
 
   // Format price
-  const formattedPrice = price
-    ? new Intl.NumberFormat('en-US', {
+  const formattedPrice = calculatedPrice
+    ? new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: price.currency_code?.toUpperCase() || 'USD',
-      }).format(price.amount / 100)
+        currency: calculatedPrice.currency_code?.toUpperCase() || 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format((calculatedPrice.calculated_amount || 0) / 100)
     : 'Price not available'
 
   return (
